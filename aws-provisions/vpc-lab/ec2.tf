@@ -94,7 +94,7 @@ resource "aws_instance" "app" {
 
   user_data = <<-EOF
     #!/bin/bash
-    echo "lab2-Application App tier 1 is Running and reachable on port 5050 Only" > index.html
+    echo "lab2-Application App tier 1 is Running and reachable on port 5050 Only." > index.html
     python3 -m http.server 5050 &
   EOF
 
