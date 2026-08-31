@@ -1,0 +1,7 @@
+[allowlist]
+paths = [
+  '''tests/fixtures/.*''',
+]
+regexes = [
+  '''example-key-[0-9]+''',
+]
