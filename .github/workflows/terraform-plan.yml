@@ -70,6 +70,7 @@ jobs:
             const output = `#### Terraform Plan: \`${{ matrix.working-directory }}\`
             \`\`\`
             ${{ steps.plan.outputs.stdout }}
+            ${{ steps.plan.outputs.stderr }}
             \`\`\`
             `;
             github.rest.issues.createComment({
