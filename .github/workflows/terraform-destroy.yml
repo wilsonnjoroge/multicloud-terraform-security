@@ -54,7 +54,7 @@ jobs:
         run: |
           case "${{ inputs.project }}" in
             vpc-lab)
-              echo "dir=terraform-iac/aws-provisions/vpc-lab" >> "$GITHUB_OUTPUT"
+              echo "dir=aws-provisions/vpc-lab" >> "$GITHUB_OUTPUT"
               ;;
             *)
               echo "Unknown project: ${{ inputs.project }}"
