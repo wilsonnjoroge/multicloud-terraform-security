@@ -1,19 +1,20 @@
-
-# for configuration options, see
-# https://github.com/marketplace/actions/gitleaks
 name: Pull Request - GitLeaks
+
 on:
   pull_request:
   push:
+
 jobs:
   scan:
     name: gitleaks
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+
+      - uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+          GITLEAKS_VERSION: 8.30.1
