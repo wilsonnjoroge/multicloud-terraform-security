@@ -4,6 +4,19 @@ title = "Project Gitleaks Config"
 useDefault = true
 
 
+[[rules]]
+id = "database-url"
+description = "Detect database connection strings containing credentials"
+regex = '''(?i)(postgres|postgresql|mysql|mongodb(?:\+srv)?):\/\/[^:\/\s]+:[^@\/\s]+@'''
+keywords = [
+  "postgres://",
+  "postgresql://",
+  "mysql://",
+  "mongodb://",
+  "mongodb+srv://",
+]
+
+
 [allowlist]
 paths = [
   '''\.terraform/.*''',
