@@ -7,3 +7,4 @@ repos:
         entry: gitleaks dir
         language: system
         pass_filenames: true
+        
