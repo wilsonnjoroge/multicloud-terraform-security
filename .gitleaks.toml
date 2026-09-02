@@ -21,6 +21,7 @@ keywords = [
 paths = [
   '''\.terraform/.*''',
   '''tests/fixtures/.*''',
+  '''^\.env\.example$''',
 ]
 
 regexes = [
