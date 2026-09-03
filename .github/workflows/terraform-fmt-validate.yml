@@ -6,6 +6,7 @@ on:
 
 jobs:
   fmt-validate:
+    name: fmt-validate
     runs-on: ubuntu-latest
     strategy:
       matrix:

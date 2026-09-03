@@ -17,3 +17,6 @@ crash.*.log
 .env
 .env.*
 !.env.example
+
+# Test Files
+*test-files/

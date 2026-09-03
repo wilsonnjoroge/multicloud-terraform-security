@@ -11,6 +11,7 @@ permissions:
 jobs:
 
   plan:
+    name: plan
     runs-on: ubuntu-latest
 
     strategy:
