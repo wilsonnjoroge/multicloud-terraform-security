@@ -60,6 +60,7 @@ resource "aws_instance" "web" {
     encrypted   = true
     volume_type = "gp3"
   }
+  
 
   user_data = <<-EOF
     #!/bin/bash
