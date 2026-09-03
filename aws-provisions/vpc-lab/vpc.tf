@@ -16,6 +16,9 @@ resource "aws_vpc" "this" {
 # each other regardless of AZ; splitting AZs only affects availability, not
 # reachability.
 # ---------------------------------------------------------------------------
+# Intentional: this subnet hosts the public-facing web tier.
+# The private subnet remains configured with map_public_ip_on_launch = false.
+# nosemgrep: terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.this.id
   cidr_block              = var.public_subnet_cidr
