@@ -10,5 +10,5 @@ repos:
 
       - id: semgrep
         name: Semgrep SAST
-        entry: semgrep --config p/default
+        entry: semgrep --config p/ci
         language: system
