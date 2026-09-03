@@ -2,9 +2,6 @@ name: Semgrep SAST
 
 on:
   push:
-    branches:
-      - main
-      - feature/sast
   pull_request:
 
 permissions:
