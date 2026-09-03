@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - vpc-lab
+
       target_environment:
         description: 'Which environment to deploy to'
         required: true
@@ -24,14 +25,18 @@ permissions:
   contents: read
 
 jobs:
+
   # ---------------------------------------------------------------------
   # Job 1: runs immediately, unattended, no approval gate.
   # ---------------------------------------------------------------------
   plan-and-estimate:
     runs-on: ubuntu-latest
+
     outputs:
       project-dir: ${{ steps.project-dir.outputs.dir }}
+
     steps:
+
       - name: Check out code
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
@@ -44,6 +49,7 @@ jobs:
             vpc-lab)
               echo "dir=aws-provisions/vpc-lab" >> "$GITHUB_OUTPUT"
               ;;
+
             *)
               echo "Unknown project: $PROJECT"
               exit 1
@@ -70,7 +76,128 @@ jobs:
         env:
           TF_VAR_my_ip_cidr: ${{ secrets.TF_VAR_MY_IP_CIDR }}
 
-      - name: Show plan summary in job log
+      # -----------------------------------------------------------------
+      # Generate machine-readable plan data for the reviewer summary.
+      # -----------------------------------------------------------------
+      - name: Generate plan JSON
+        working-directory: ${{ steps.project-dir.outputs.dir }}
+        run: |
+          terraform show \
+            -json \
+            tfplan \
+            > tfplan.json
+
+      # -----------------------------------------------------------------
+      # Generate a concise human-readable resource change summary.
+      # -----------------------------------------------------------------
+      - name: Generate plan summary
+        working-directory: ${{ steps.project-dir.outputs.dir }}
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.target_environment }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          plan_file = Path("tfplan.json")
+          output_file = Path("terraform-plan-summary.md")
+
+          data = json.loads(plan_file.read_text())
+
+          resource_changes = data.get("resource_changes", [])
+
+          create = []
+          update = []
+          replace = []
+          destroy = []
+
+          for resource in resource_changes:
+              address = resource.get("address", "unknown")
+              actions = resource.get("change", {}).get("actions", [])
+
+              if actions == ["create"]:
+                  create.append(address)
+
+              elif actions == ["update"]:
+                  update.append(address)
+
+              elif actions == ["delete"]:
+                  destroy.append(address)
+
+              elif set(actions) == {"create", "delete"}:
+                  replace.append(address)
+
+          lines = []
+
+          lines.append("# Terraform Apply Plan")
+          lines.append("")
+          lines.append(f"**Project:** `{Path.cwd().name}`")
+          lines.append(
+              f"**Environment:** `{os.environ['TARGET_ENVIRONMENT']}`"
+          )
+          lines.append("")
+          lines.append(
+              "> ⚠️ **Review the planned infrastructure changes "
+              "before approving the apply job.**"
+          )
+          lines.append("")
+
+          lines.append("## Resources")
+          lines.append("")
+          lines.append("| Action | Resource |")
+          lines.append("|---|---|")
+
+          for address in create:
+              lines.append(f"| 🟢 Create | `{address}` |")
+
+          for address in update:
+              lines.append(f"| 🟡 Change | `{address}` |")
+
+          for address in replace:
+              lines.append(f"| 🟠 Replace | `{address}` |")
+
+          for address in destroy:
+              lines.append(f"| 🔴 Destroy | `{address}` |")
+
+          if not create and not update and not replace and not destroy:
+              lines.append(
+                  "| ℹ️ No changes | No resource changes detected |"
+              )
+
+          lines.append("")
+          lines.append("## Summary")
+          lines.append("")
+          lines.append("| Create | Change | Replace | Destroy |")
+          lines.append("|---:|---:|---:|---:|")
+          lines.append(
+              f"| {len(create)} | "
+              f"{len(update)} | "
+              f"{len(replace)} | "
+              f"{len(destroy)} |"
+          )
+          lines.append("")
+
+          if create or update or replace or destroy:
+              lines.append(
+                  "> 🔐 **Approval is required before Terraform Apply can run.**"
+              )
+          else:
+              lines.append(
+                  "> ℹ️ **Terraform has no resource changes to apply.**"
+              )
+
+          output_file.write_text("\n".join(lines))
+
+          print(output_file.read_text())
+          PY
+
+      - name: Add plan summary to job summary
+        working-directory: ${{ steps.project-dir.outputs.dir }}
+        run: |
+          cat terraform-plan-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Show full plan in job log
         working-directory: ${{ steps.project-dir.outputs.dir }}
         run: terraform show -no-color tfplan
 
@@ -91,21 +218,23 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: tfplan-${{ inputs.target_environment }}
-          path: ${{ steps.project-dir.outputs.dir }}/tfplan
+          path: |
+            ${{ steps.project-dir.outputs.dir }}/tfplan
+            ${{ steps.project-dir.outputs.dir }}/terraform-plan-summary.md
           retention-days: 1
 
   # ---------------------------------------------------------------------
-  # Job 2: this is the one gated by GitHub Environment protection rules
-  # (required reviewers). By the time a reviewer is asked to approve,
-  # job 1's log already shows the real plan and its cost -- approval is
-  # informed, not blind. This job never recomputes the plan; it applies
-  # exactly the artifact job 1 already produced.
+  # Job 2: Gated by GitHub Environment protection rules (required
+  # reviewers).
   # ---------------------------------------------------------------------
   apply:
     needs: plan-and-estimate
     runs-on: ubuntu-latest
+
     environment: ${{ inputs.target_environment }}
+
     steps:
+
       - name: Check out code
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
@@ -130,7 +259,11 @@ jobs:
 
       - name: Terraform Apply (applies the exact plan from job 1, nothing recomputed)
         working-directory: ${{ needs.plan-and-estimate.outputs.project-dir }}
-        run: terraform apply -input=false -auto-approve tfplan
+        run: |
+          terraform apply \
+            -input=false \
+            -auto-approve \
+            tfplan
 
       - name: Upload private key as artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -138,9 +271,3 @@ jobs:
           name: ssh-key
           path: ${{ needs.plan-and-estimate.outputs.project-dir }}/lab2-key.pem
           retention-days: 1
-          # Short retention deliberately: this key is only ever needed
-          # right after this specific apply run. GitHub artifacts are not
-          # a real secrets store -- anyone with read access to this repo's
-          # Actions runs can download it during the 1-day window. For
-          # anything beyond quick manual access, push it to AWS Secrets
-          # Manager instead of relying on artifact retention.
