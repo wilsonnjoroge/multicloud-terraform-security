@@ -12,13 +12,15 @@ crash.*.log
 # Generated SSH keys
 *.pem
 
+# venv
+.venv
+
 # TXT files
 *.txt
 .env
 .env.*
 !.env.example
 
-# Test Files
 
 # Test Files
 aws-provisions/test-files/vpc-lab/sast-local-test.tf
