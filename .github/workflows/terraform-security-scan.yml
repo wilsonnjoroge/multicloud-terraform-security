@@ -15,7 +15,7 @@ jobs:
           - aws-provisions/vpc-lab
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
         with:
           fetch-depth: 0 # full history, needed to diff against the base branch
 
@@ -32,7 +32,7 @@ jobs:
 
       - name: Run tfsec
         if: steps.tf-changes.outputs.changed == 'true'
-        uses: aquasecurity/tfsec-action@v1.0.3
+        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6
         with:
           working_directory: ${{ matrix.working-directory }}
           # Excluded: these three findings are the intentional design of
