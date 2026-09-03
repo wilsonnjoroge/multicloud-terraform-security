@@ -38,6 +38,9 @@ resource "local_sensitive_file" "pem" {
 # ---------------------------------------------------------------------------
 # Web tier -- public subnet, public IP, HTTP server on port 80 only
 # ---------------------------------------------------------------------------
+# Intentional: this is the public-facing web tier for the 3-tier demo.
+# App and DB tiers are private and do not receive public IP addresses.
+# nosemgrep: terraform.aws.security.aws-ec2-has-public-ip.aws-ec2-has-public-ip
 resource "aws_instance" "web" {
   ami                         = data.aws_ami.al2023.id
   instance_type               = var.instance_type
