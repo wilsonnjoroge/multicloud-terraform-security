@@ -12,9 +12,7 @@ resource "aws_vpc" "this" {
 }
 
 # ---------------------------------------------------------------------------
-# Subnets -- public in AZ-a, private in AZ-b. Same VPC, so they can reach
-# each other regardless of AZ; splitting AZs only affects availability, not
-# reachability.
+# Subnets -- public in AZ-a, private in AZ-b. Same VPC, different AZs
 # ---------------------------------------------------------------------------
 # Intentional: this subnet hosts the public-facing web tier.
 # The private subnet remains configured with map_public_ip_on_launch = false.
@@ -74,9 +72,7 @@ resource "aws_route_table_association" "public" {
 }
 
 # ---------------------------------------------------------------------------
-# Private route table: local traffic only (no 0.0.0.0/0 route -- there's no
-# NAT Gateway). Created explicitly rather than relying on the implicit main
-# route table, so it's visible and named in the console/state.
+# Private route table: local traffic only
 # ---------------------------------------------------------------------------
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
