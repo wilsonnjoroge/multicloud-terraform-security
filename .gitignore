@@ -22,4 +22,4 @@ crash.*.log
 
 # Test Files
 aws-provisions/test-files/vpc-lab/sast-local-test.tf
-#aws-provisions/test-files/vpc-lab/sast-ci-test.tf
+aws-provisions/test-files/vpc-lab/sast-ci-test.tf
