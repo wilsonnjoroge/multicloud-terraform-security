@@ -13,7 +13,7 @@ jobs:
           - aws-provisions/vpc-lab
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
         with:
           fetch-depth: 0 # full history, needed to diff against the base branch
 
@@ -30,7 +30,7 @@ jobs:
 
       - name: Set up Terraform
         if: steps.tf-changes.outputs.changed == 'true'
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
 
       - name: Check formatting
         if: steps.tf-changes.outputs.changed == 'true'
