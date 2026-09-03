@@ -55,7 +55,7 @@ jobs:
           echo "Destroy confirmation accepted."
 
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
       - name: Map project input to working directory
         id: project-dir
@@ -74,13 +74,13 @@ jobs:
           esac
 
       - name: Configure AWS credentials (OIDC - plan)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c
         with:
           role-to-assume: arn:aws:iam::025066283316:role/github-actions-terraform-plan-workflow
           aws-region: us-east-1
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
 
       - name: Terraform Init
         working-directory: ${{ steps.project-dir.outputs.dir }}
@@ -107,9 +107,12 @@ jobs:
 
       - name: Generate destroy plan summary
         working-directory: ${{ steps.project-dir.outputs.dir }}
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.target_environment }}
         run: |
           python3 - <<'PY'
           import json
+          import os
           from pathlib import Path
 
           plan_file = Path("tfplan-destroy.json")
@@ -152,7 +155,7 @@ jobs:
               f"**Project:** `{Path.cwd().name}`  "
           )
           lines.append(
-              f"**Environment:** `{ '${{ inputs.target_environment }}' }`"  # nosemgrep: yaml.github-actions.security.run-shell-injection.run-shell-injection
+              f"**Environment:** `{os.environ['TARGET_ENVIRONMENT']}`"
           )
           lines.append("")
           lines.append(
@@ -213,8 +216,9 @@ jobs:
         working-directory: ${{ steps.project-dir.outputs.dir }}
         run: |
           cat destroy-plan-summary.md >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload destroy plan
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: tfplan-destroy-${{ inputs.target_environment }}
           path: |
@@ -237,22 +241,22 @@ jobs:
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
 
       - name: Download destroy plan artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: tfplan-destroy-${{ inputs.target_environment }}
           path: ${{ needs.plan-destroy.outputs.project-dir }}
 
       - name: Configure AWS credentials (OIDC - destroy)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c
         with:
           role-to-assume: arn:aws:iam::025066283316:role/github-actions-terraform-apply
           aws-region: us-east-1
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
 
       - name: Terraform Init
         working-directory: ${{ needs.plan-destroy.outputs.project-dir }}
