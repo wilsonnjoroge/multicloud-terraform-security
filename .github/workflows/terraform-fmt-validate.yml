@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         working-directory:
-          - aws-provisions/vpc-lab
+          - aws-provisions/labs/vpc-lab
     steps:
       - name: Check out code
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
