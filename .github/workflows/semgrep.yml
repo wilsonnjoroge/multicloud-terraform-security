@@ -28,4 +28,4 @@ jobs:
 
       - name: Run Semgrep SAST
         run: |
-          semgrep --config p/default --error .
+          git ls-files -z | xargs -0 semgrep scan --config p/default --no-git-ignore --error
