@@ -76,10 +76,13 @@ Gitleaks
     
     Semgrep 
 
+        semgrep scan --config p/default . > path/to/reports_and_outputs/semgrep_findings_default_$(date +%d%m%Y%H%M).txt
+
+        semgrep scan --config p/default <path-to-file> > path/to/reports_and_outputs/semgrep_findings_default_$(date +%d%m%Y%H%M).txt
+
         semgrep scan --config p/ci . > path/to/reports_and_outputs/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
 
         semgrep scan --config p/ci <path-to-file> > path/to/reports_and_outputs/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
-
 
 =============================================================================================================================
 
