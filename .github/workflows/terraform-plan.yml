@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         working-directory:
-          - aws-provisions/vpc-lab
+          - aws-provisions/labs/vpc-lab
 
     steps:
 

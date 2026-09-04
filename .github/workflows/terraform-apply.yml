@@ -47,7 +47,7 @@ jobs:
         run: |
           case "$PROJECT" in
             vpc-lab)
-              echo "dir=aws-provisions/vpc-lab" >> "$GITHUB_OUTPUT"
+              echo "dir=aws-provisions/labs/vpc-lab" >> "$GITHUB_OUTPUT"
               ;;
 
             *)

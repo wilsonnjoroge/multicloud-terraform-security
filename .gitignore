@@ -31,4 +31,4 @@ aws-provisions/test-files/vpc-lab/semgrep-local-tf-test.tf
 aws-provisions/test-files/security/
 
 
-aws-provisions/vpc-lab/resource-explorer/*.json
+aws-provisions/reports_and_outputs/*.json
