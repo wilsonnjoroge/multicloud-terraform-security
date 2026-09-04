@@ -71,19 +71,61 @@ Gitleaks
         # Update the remote disposable branch with the rewritten history
         git push --force-with-lease origin <branch-name>
 
-
-
 =============================================================================================================================
-    
-    Semgrep 
 
-        semgrep scan --config p/default . > path/to/reports_and_outputs/semgrep_findings_default_$(date +%d%m%Y%H%M).txt
+Semgrep
 
-        semgrep scan --config p/default <path-to-file> > path/to/reports_and_outputs/semgrep_findings_default_$(date +%d%m%Y%H%M).txt
+        # Verify installed Semgrep version
+        semgrep --version
 
-        semgrep scan --config p/ci . > path/to/reports_and_outputs/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
+        # Directly scan an intentionally vulnerable file
+        semgrep scan --config p/default <file path> --error
 
-        semgrep scan --config p/ci <path-to-file> > path/to/reports_and_outputs/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
+        # Generate a detailed JSON report without modifying the source file
+        semgrep scan --config p/default <file path> --json --output /path/to/reports_and_outputs/semgrep_local_report_$(date +%d%m%Y%H%M).json
+
+        # Force-stage the ignored vulnerable test fixture for the controlled test
+        git add -f <file path>
+
+        # Verify the local pre-commit Semgrep hook blocks the vulnerable file
+        git commit -m "test: verify local semgrep detection"
+
+        # Deliberately bypass local hooks so CI can detect the vulnerability
+        git commit --no-verify -m "test: verify CI semgrep detection"
+
+        # Push the disposable test commit so CI can detect the vulnerability
+        git push
+
+        # Remove the test fixture from Git tracking while keeping it locally
+        git rm --cached <file path>
+
+        # Commit the removal from Git tracking
+        git commit -m "test: remove intentional semgrep test fixture from tracking"
+
+        # Verify Semgrep scans all Git-tracked files even when Git ignores them
+        git ls-files -z | xargs -0 semgrep scan --config p/default --no-git-ignore --error
+
+        # Identify the bad disposable test commit
+        git log --oneline -5
+
+        # Rewrite history starting immediately before the bad commit
+        git rebase -i <commit-before-bad-commit>
+
+        # Change the bad commit from pick to drop in the interactive rebase
+        drop <bad-commit>
+
+        # Skip an empty cleanup commit if the dropped commit already removed its changes
+        git rebase --skip
+
+        # Verify the bad commit is no longer on the branch
+        git log --oneline -5
+
+        # Verify the test file/commit is no longer reachable in Git history
+        git log --oneline --all -- <file path>
+
+        # Update the remote disposable branch with the rewritten history
+        git push --force-with-lease origin <branch-name>
+
 
 =============================================================================================================================
 
