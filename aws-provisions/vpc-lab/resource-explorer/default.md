@@ -13,13 +13,25 @@ The default directory for keeping the inventory checks eg
             ./aws-inventory-check.sh > resource-explorer/after-destroy-$(date +%d%m%Y%H%M).txt
 
         2. PY
-            ./aws-inventory-check.sh > resource-explorer/after-destroy-py-$(date +%d%m%Y%H%M).txt
-            ./aws-inventory-check.sh > ../resource-explorer/current-status-py-$(date +%d%m%Y%H%M).txt
-    
-    Semgrep p/ci config on curremt dir
-        semgrep scan --config p/ci . > ./aws-provisions/vpc-lab/resource-explorer/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
+            ./aws-inventory-check.sh > path/to/reports/current-status-py-$(date +%d%m%Y%H%M).txt
+            ./aws-inventory-check.sh > path/to/reports/after-destroy-py-$(date +%d%m%Y%H%M).txt
 
-        semgrep scan --config p/ci <path-to-file> > ./aws-provisions/vpc-lab/resource-explorer/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
+=============================================================================================================================
+
+    Gitleaks 
+
+        gitleaks dir <file path> --redact
+
+        gitleaks dir <file path> --redact --report-format json --report-path path/to/reports/gitleaks_local_report_$(date +%d%m%Y%H%M).json
+
+
+=============================================================================================================================
+    
+    Semgrep 
+
+        semgrep scan --config p/ci . > path/to/reports/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
+
+        semgrep scan --config p/ci <path-to-file> > path/to/reports/semgrep_findings_p-ci_$(date +%d%m%Y%H%M).txt
 
 
 =============================================================================================================================
