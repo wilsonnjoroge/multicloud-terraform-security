@@ -26,3 +26,9 @@ crash.*.log
 aws-provisions/test-files/vpc-lab/semgrep-ci-py-test.py
 aws-provisions/test-files/vpc-lab/semgrep-ci-tf-test.tf
 aws-provisions/test-files/vpc-lab/semgrep-local-tf-test.tf
+
+# Security testing fixtures
+aws-provisions/test-files/security/
+
+
+aws-provisions/vpc-lab/resource-explorer/*.json
