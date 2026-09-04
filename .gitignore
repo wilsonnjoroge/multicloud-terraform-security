@@ -28,7 +28,7 @@ aws-provisions/test-files/vpc-lab/semgrep-ci-tf-test.tf
 aws-provisions/test-files/vpc-lab/semgrep-local-tf-test.tf
 
 # Security testing fixtures
-aws-provisions/test-files/security/
+aws-provisions/tests/security/
 
 
 aws-provisions/reports_and_outputs/*.json
