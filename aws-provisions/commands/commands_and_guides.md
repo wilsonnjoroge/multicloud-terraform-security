@@ -13,8 +13,13 @@ The default directory for keeping the inventory checks eg
             ./aws-inventory-check.sh > path/to/reports_and_outputs/status-after-destroy-$(date +%d%m%Y%H%M).txt
 
         2. PY
-            ./aws-inventory-check.sh > path/to/reports_and_outputs/status-current-py-$(date +%d%m%Y%H%M).txt
-            ./aws-inventory-check.sh > path/to/reports_and_outputs/status-after-destroy-py-$(date +%d%m%Y%H%M).txt
+
+            python3 -m venv .venv
+            source .venv/bin/activate
+            python -m pip install -r aws-provisions/scripts/requirements.txt    
+            
+            python3 ./aws-inventory-check.sh > path/to/reports_and_outputs/status-current-py-$(date +%d%m%Y%H%M).txt
+            python3 ./aws-inventory-check.sh > path/to/reports_and_outputs/status-after-destroy-py-$(date +%d%m%Y%H%M).txt
 
 =============================================================================================================================
 
